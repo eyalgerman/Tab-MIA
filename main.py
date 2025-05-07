@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 from datasets import load_dataset
 from huggingface_hub import login
-import QLora_Medium_Finetune_LLM
+import finetune_LLM
 from MIA import mia_detection
 from options import Options
 from process_data import process_csv_file, data_preparation
@@ -165,7 +165,7 @@ def main(args):
         else:
             print("No existing model found. Training a new model.")
     if not new_model:
-        new_model = QLora_Medium_Finetune_LLM.main(args.target_model, file_path_member, output_dir + "/Models/", args.num_epochs)
+        new_model = finetune_LLM.main(args.target_model, file_path_member, output_dir + "/Models/", args.num_epochs)
     args.target_model = new_model
     encoders = ['key-value-pair', 'line-sep', 'markdown', 'html', 'json', 'key-is-value']
     encoders = [args.table_encoding]

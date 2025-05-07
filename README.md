@@ -1,6 +1,6 @@
 # Tab-MIA: Benchmarking Membership Inference Attacks on LLMs for Tabular Data
 
-This repository contains the official code and datasets for the paper:
+[//]: # (This repository contains the official code and datasets for the paper:)
 
 ---
 
@@ -19,10 +19,8 @@ Key contributions include:
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/your-org/tabular-mia.git
-cd tabular-mia
-conda create -n tabular-mia-env python=3.11 -y
-conda activate tabular-mia-env
+conda create -n tab-mia-env python=3.11 -y
+conda activate tab-mia-env
 
 # Install dependencies
 pip install -r requirements.txt

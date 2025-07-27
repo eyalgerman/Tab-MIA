@@ -136,6 +136,6 @@ python main_syn.py --data <path_to_JSONL_file> \
 [//]: # ()
 [//]: # (---)
 ## 🔌 Extending the Benchmark
-See [docs/EXTENDING.md](docs/EXTENDING.md) for instructions on adding new attack methods and using different language models.
+See [docs/EXTENDING.md](docs/EXTENDING.md) for instructions on adding new attack methods, using different language models, and evaluating custom CSV datasets.
 ## 🛡 License
 This project is licensed under the MIT License. 

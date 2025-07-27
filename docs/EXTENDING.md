@@ -26,6 +26,17 @@ This guide explains how to add new membership inference attack (MIA) methods and
    - After fine-tuning (or when using a pretrained model), the pipeline calls `MIA/mia_detection.py` to compute attack metrics.
    - The results are saved under `output_dir/results/<model>/<dataset>`.
 
+## Using a Custom CSV Dataset
+
+1. **Provide a CSV file**
+   - Use the `--data` argument with the path to your CSV when running `main.py`.
+   - Choose the table serialization format via `--table_encoding` (e.g., `json`, `markdown`).
+2. **Automatic conversion**
+   - The script splits the CSV into member and non-member tables using `process_data/process_csv_file.py`.
+   - Converted files and a `.jsonl` version are stored under `output_dir/Datasets/<csv_name>/`.
+3. **Run on a pretrained model only**
+   - For evaluation without fine-tuning, pass the CSV path to `main_syn.py` instead.
+
 ## Example Workflow
 
 ```bash

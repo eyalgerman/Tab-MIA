@@ -190,9 +190,9 @@ def main(args):
     tarin_jsonl_path = output_jsonl_path
     for enc in encoders:
         try:
-            if enc == args.table_encoding:
-                output_jsonl_path = tarin_jsonl_path
-            elif args.data[-4:] == ".csv":
+            # if enc == args.table_encoding:
+            #     output_jsonl_path = tarin_jsonl_path
+            if args.data[-4:] == ".csv":
                 file_path_member, file_path_non_member, output_jsonl_path = process_csv_file.chunk_csv_to_text(
                     args.data,
                     output_dir=output_dir,
@@ -200,7 +200,7 @@ def main(args):
                     table_encoding=enc,
                     use_existing_data=True,
                     chunk_size=args.max_table_size,
-                    drop_columns=args.drop_columns
+                    drop_columns=None
                 )
             elif args.data.startswith("tabMIA_"):
                 # Load dataset from Hugging Face, e.g., "tabMIA_adult"
@@ -217,14 +217,10 @@ def main(args):
                     use_existing_data=True,
                     table_encoding=enc,
                     max_table_size=args.max_table_size,
-                    drop_columns=args.drop_columns
+                    drop_columns=None
                 )
-            # Check if it has a metrics results file
-            metrics_path = None
-            if metrics_path is None and args.use_existing == 'all':
-                mia_detection.main(model_path=new_model, data_path=output_jsonl_path, output_dir=args.output_dir)
-            else:
-                print(f"Metrics file already exists: {metrics_path}")
+            print(f"Processing encoder: {enc}")
+            mia_detection.main(model_path=new_model, data_path=output_jsonl_path, output_dir=args.output_dir)
         except Exception as e:
             print(f"Error processing encoder {enc}: \n{e}")
             raise e

@@ -12,12 +12,13 @@ from process_data import tables_encoder
 result = []
 TOP_K = 10000
 
-def convert2df(table_dict):
+def convert2df(table_dict, drop_columns=None):
     """
     Converts a dictionary with 'header' and 'rows' keys into a pandas DataFrame.
 
     Args:
         table_dict (dict): Dictionary with 'header' (list of column names) and 'rows' (list of rows).
+        drop_columns (list[int], optional): Column indexes (0-based) to remove before creating the DataFrame.
 
     Returns:
         pandas.DataFrame: The resulting DataFrame with all values converted to strings.
@@ -25,6 +26,9 @@ def convert2df(table_dict):
     columns = table_dict['header']
     data = table_dict['rows']
     df = pd.DataFrame(data, columns=columns)
+    if drop_columns:
+        cols_to_drop = [df.columns[i] for i in drop_columns if i < len(df.columns)]
+        df = df.drop(columns=cols_to_drop)
     df = df.astype(str)
     return df
 
@@ -43,13 +47,14 @@ def convertdf2string(df):
     df_string = '\n'.join(df)
     return df_string
 
-def convert_to_df(table_dict, data_mode):
+def convert_to_df(table_dict, data_mode, drop_columns=None):
     """
     Converts a table dictionary or text format to a DataFrame depending on dataset mode.
 
     Args:
         table_dict (dict or str): Table data structure.
         data_mode (str): Dataset type (e.g., "tab_fact", "WTQ").
+        drop_columns (list[int], optional): Column indexes (0-based) to remove from the table.
 
     Returns:
         pandas.DataFrame: Converted DataFrame.
@@ -59,10 +64,16 @@ def convert_to_df(table_dict, data_mode):
         columns = lines[0].split('#')
         data_rows = [line.split('#') for line in lines[1:]]
         df = pd.DataFrame(data_rows, columns=columns)
+        if drop_columns:
+            cols_to_drop = [df.columns[i] for i in drop_columns if i < len(df.columns)]
+            df = df.drop(columns=cols_to_drop)
         return df
     columns = table_dict['header']
     data = table_dict['rows']
     df = pd.DataFrame(data, columns=columns)
+    if drop_columns:
+        cols_to_drop = [df.columns[i] for i in drop_columns if i < len(df.columns)]
+        df = df.drop(columns=cols_to_drop)
     return df
 
 def convert_df_to_string(df):
@@ -128,7 +139,7 @@ def jsonl_to_member_csv(jsonl_path: str) -> str:
     return output_csv_path
 
 
-def load_data(data_mode="WTQ", split="train", file_path=None, top_k=None):
+def load_data(data_mode="WTQ", split="train", file_path=None, top_k=None, drop_columns=None):
     """
     Loads data from Hugging Face datasets and prepares member/non-member splits.
 
@@ -137,6 +148,7 @@ def load_data(data_mode="WTQ", split="train", file_path=None, top_k=None):
         split (str): Dataset split ("train", "test").
         file_path (str, optional): Base path to save CSV and JSONL outputs.
         top_k (int, optional): Number of samples to use.
+        drop_columns (list[int], optional): Column indexes (0-based) to remove from each table before conversion.
 
     Returns:
         Tuple[str, str, str]: Paths to member CSV, non-member CSV, and output JSONL file.
@@ -153,7 +165,7 @@ def load_data(data_mode="WTQ", split="train", file_path=None, top_k=None):
     # Load member data
     for i in range(member_count):
         sample = dataset[i]
-        data = convert2df(sample['table'])
+        data = convert2df(sample['table'], drop_columns=drop_columns)
         data_str = convertdf2string(data)
         question = sample['question']
         answer = sample['answers']
@@ -168,7 +180,7 @@ def load_data(data_mode="WTQ", split="train", file_path=None, top_k=None):
     # Load non-member data
     for i in range(member_count, top_k):
         sample = dataset[i]
-        data = convert2df(sample['table'])
+        data = convert2df(sample['table'], drop_columns=drop_columns)
         data_str = convertdf2string(data)
         question = sample['question']
         answer = sample['answers']
@@ -223,7 +235,17 @@ def load_data_from_datasets(data_mode, split):
     return dataset
 
 
-def load_data_unique_tables(data_mode="WTQ", split="train", output_dir=None, top_k=None, seed=42, use_existing_data=False, table_encoding="line_sep", max_table_size=-1):
+def load_data_unique_tables(
+    data_mode="WTQ",
+    split="train",
+    output_dir=None,
+    top_k=None,
+    seed=42,
+    use_existing_data=False,
+    table_encoding="line_sep",
+    max_table_size=-1,
+    drop_columns=None,
+):
     """
     Loads a dataset and extracts unique tables, optionally filtered by size and encoding.
 
@@ -236,6 +258,7 @@ def load_data_unique_tables(data_mode="WTQ", split="train", output_dir=None, top
         use_existing_data (bool): Whether to reuse cached CSV/JSONL files if they exist.
         table_encoding (str): Format for encoding tables ("markdown", "line_sep", etc.).
         max_table_size (int): Max character length of table strings to include (-1 for unlimited).
+        drop_columns (list[int], optional): Column indexes (0-based) to remove from each table before encoding.
 
     Returns:
         Tuple[str, str, str]: Paths to member CSV, non-member CSV, and JSONL file.
@@ -243,7 +266,10 @@ def load_data_unique_tables(data_mode="WTQ", split="train", output_dir=None, top
     random.seed(seed)
     folder = f"{output_dir}/Datasets/{data_mode}/"
     os.makedirs(folder, exist_ok=True)
-    file_path = folder + f"{data_mode}_{split}_format_{table_encoding}_k_{top_k}_unique_seed_{str(seed)}_max_table_{str(max_table_size)}.csv"
+    drop_suffix = ""
+    if drop_columns:
+        drop_suffix = "_drop_" + "_".join(str(i) for i in drop_columns)
+    file_path = folder + f"{data_mode}_{split}_format_{table_encoding}{drop_suffix}_k_{top_k}_unique_seed_{str(seed)}_max_table_{str(max_table_size)}.csv"
     file_path_member = file_path.replace(".csv", "_member.csv")
     file_path_non_member = file_path.replace(".csv", "_non_member.csv")
     output_jsonl_path = file_path.replace(".csv", ".jsonl")
@@ -262,7 +288,7 @@ def load_data_unique_tables(data_mode="WTQ", split="train", output_dir=None, top
     num_unique_tables = 0
     for i in range(top_k):
         table = dataset[i]['table']
-        table_df = convert_to_df(table, data_mode)
+        table_df = convert_to_df(table, data_mode, drop_columns=drop_columns)
         table_str = convert_df_to_string(table_df)
         table_hash = hash(table_str)  # Use hash to track unique tables
         if max_table_size > 0 and len(table_str) > max_table_size: # Skip tables larger than max_table_size

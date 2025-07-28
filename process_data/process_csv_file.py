@@ -50,8 +50,16 @@ def download_kaggle_dataset(dataset_name, output_dir):
     print(f"Dataset '{dataset_name}' unzipped.")
 
 
-def chunk_csv_to_text(csv_path, chunk_size=1000, seed=42, output_dir=None, split=True,
-                      table_encoding="key-value-pair", use_existing_data=False):
+def chunk_csv_to_text(
+    csv_path,
+    chunk_size=1000,
+    seed=42,
+    output_dir=None,
+    split=True,
+    table_encoding="key-value-pair",
+    use_existing_data=False,
+    drop_columns=None,
+):
     """
     Reads a CSV file in chunks of 'chunk_size' rows,
     converts each chunk to a text representation,
@@ -74,6 +82,8 @@ def chunk_csv_to_text(csv_path, chunk_size=1000, seed=42, output_dir=None, split
         Encoding format for table text. Default is 'line-sep'.
     tables_encoder : object, optional
         An encoder object with a method 'encode_df_of_tables' to encode table text.
+    drop_columns : list[int], optional
+        Column indexes (0-based) to remove from the CSV before processing.
 
     Returns:
     --------
@@ -90,7 +100,10 @@ def chunk_csv_to_text(csv_path, chunk_size=1000, seed=42, output_dir=None, split
         data_name = os.path.basename(csv_path).split(".")[0]
         folder = f"{output_dir}/Datasets/{data_name}/"
         os.makedirs(folder, exist_ok=True)
-        file_path = folder + f"{data_name}_format_{table_encoding}_seed_{str(seed)}_chunksize_{str(chunk_size)}.csv"
+        drop_suffix = ""
+        if drop_columns:
+            drop_suffix = "_drop_" + "_".join(str(i) for i in drop_columns)
+        file_path = folder + f"{data_name}{drop_suffix}_format_{table_encoding}_seed_{str(seed)}_chunksize_{str(chunk_size)}.csv"
         file_path_member = os.path.join(output_dir, file_path.replace(".csv", "_member.csv"))
         file_path_non_member = os.path.join(output_dir, file_path.replace(".csv", "_non_member.csv"))
         output_jsonl_path = os.path.join(output_dir, file_path.replace(".csv", ".jsonl"))
@@ -100,6 +113,9 @@ def chunk_csv_to_text(csv_path, chunk_size=1000, seed=42, output_dir=None, split
     text_chunks = []
     # Read CSV in iterable chunks
     for chunk in pd.read_csv(csv_path, chunksize=chunk_size):
+        if drop_columns:
+            cols_to_drop = [chunk.columns[i] for i in drop_columns if i < len(chunk.columns)]
+            chunk = chunk.drop(columns=cols_to_drop)
         rows_as_text = []
 
         for _, row in chunk.iterrows():
@@ -143,10 +159,22 @@ def chunk_csv_to_text(csv_path, chunk_size=1000, seed=42, output_dir=None, split
     return df_member, df_non_member, None
 
 
-def chunk_csv_with_synthetic_data(csv_path, csv_syn_path, chunk_size=1000, seed=42, output_dir=None,
-    table_encoding="", use_existing_data=False):
+def chunk_csv_with_synthetic_data(
+    csv_path,
+    csv_syn_path,
+    chunk_size=1000,
+    seed=42,
+    output_dir=None,
+    table_encoding="",
+    use_existing_data=False,
+    drop_columns=None,
+):
     """
-    Reads a CSV file in chunks of 'chunk_size' rows,
+    Reads a CSV file in chunks of 'chunk_size' rows.
+
+    Parameters are similar to ``chunk_csv_to_text`` with ``csv_syn_path`` as the
+    synthetic CSV and an optional ``drop_columns`` list of column indexes to
+    remove from both datasets before processing.
     """
     random.seed(seed)
     random.seed(seed)
@@ -158,7 +186,10 @@ def chunk_csv_with_synthetic_data(csv_path, csv_syn_path, chunk_size=1000, seed=
         data_name = os.path.basename(csv_path).split(".")[0]
         folder = f"{output_dir}/Datasets/{data_name}/"
         os.makedirs(folder, exist_ok=True)
-        file_path = folder + f"{data_name}_format_{table_encoding}_seed_{str(seed)}_chunksize_{str(chunk_size)}_all_data.csv"
+        drop_suffix = ""
+        if drop_columns:
+            drop_suffix = "_drop_" + "_".join(str(i) for i in drop_columns)
+        file_path = folder + f"{data_name}{drop_suffix}_format_{table_encoding}_seed_{str(seed)}_chunksize_{str(chunk_size)}_all_data.csv"
         file_path_member = os.path.join(output_dir, file_path.replace(".csv", "_member.csv"))
         file_path_non_member = os.path.join(output_dir, file_path.replace(".csv", "_non_member_syn.csv"))
         output_jsonl_path = os.path.join(output_dir, file_path.replace(".csv", "_with_synthetic.jsonl"))
@@ -169,6 +200,9 @@ def chunk_csv_with_synthetic_data(csv_path, csv_syn_path, chunk_size=1000, seed=
     chunk_list_1, chunk_list_2 = [] , []
     # Read CSV in iterable chunks
     for chunk in pd.read_csv(csv_path, chunksize=chunk_size):
+        if drop_columns:
+            cols_to_drop = [chunk.columns[i] for i in drop_columns if i < len(chunk.columns)]
+            chunk = chunk.drop(columns=cols_to_drop)
         rows_as_text = []
 
         for _, row in chunk.iterrows():
@@ -179,6 +213,9 @@ def chunk_csv_with_synthetic_data(csv_path, csv_syn_path, chunk_size=1000, seed=
         chunk_list_1.append(chunk_text)
 
     for chunk in pd.read_csv(csv_syn_path, chunksize=chunk_size):
+        if drop_columns:
+            cols_to_drop = [chunk.columns[i] for i in drop_columns if i < len(chunk.columns)]
+            chunk = chunk.drop(columns=cols_to_drop)
         rows_as_text = []
 
         for _, row in chunk.iterrows():

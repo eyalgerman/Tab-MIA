@@ -368,4 +368,4 @@ def main(model_path, data_path, suffix = "", output_dir=""):
 if __name__ == '__main__':
     args = Options()
     args = args.parser.parse_args()
-    main(args)
+    main(args.target_model, args.data, "", output_dir=args.output_dir)

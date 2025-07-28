@@ -77,6 +77,10 @@ Parameter explanations:
   - `key-value-pair` – "Key is Value" per cell
   - `key-is-value` – Same as above, in natural sentence form
   - `line-sep` – Line-separated, comma-separated rows
+- `--max_table_size`: Maximum number of rows per table chunk when creating datasets.
+- `--drop_columns`: Comma-separated list of **column indexes** (0-based) to remove from the tables before fine-tuning or evaluation. This enables experiments on hiding sensitive attributes. When used, the output dataset files include a `_drop_<indexes>` suffix indicating the removed columns.
+
+Dropping columns can mitigate membership inference if sensitive attributes carry unique signals. However, removing essential fields may degrade model performance and might not fully eliminate leakage if remaining attributes still correlate with membership.
 
 ### Dataset Input Modes 
 - **Run Tab-MIA**: When `--data` starts with `tabMIA_`, the data is automatically fetched from Hugging Face datasets (e.g., `tabMIA_adult`).

@@ -61,8 +61,15 @@ def main(args):
         ext = os.path.splitext(args.data)[1].lower()
         if ext == ".csv":
             file_path_member, file_path_non_member, output_jsonl_path = process_csv_file.chunk_csv_with_synthetic_data(
-                args.data, args.syn_data, output_dir=output_dir, seed=args.seed, table_encoding=enc,
-                use_existing_data=use_existing_data, chunk_size=args.max_table_size)
+                args.data,
+                args.syn_data,
+                output_dir=output_dir,
+                seed=args.seed,
+                table_encoding=enc,
+                use_existing_data=use_existing_data,
+                chunk_size=args.max_table_size,
+                drop_columns=args.drop_columns,
+            )
             mia_detection.main(model_path=args.target_model, data_path=output_jsonl_path, output_dir=args.output_dir)
         elif ext == ".jsonl":
             main_short_tables(args, enc)
@@ -75,4 +82,8 @@ def main(args):
 if __name__ == '__main__':
     args = Options()
     args = args.parser.parse_args()
+    if args.drop_columns:
+        args.drop_columns = [int(i) for i in args.drop_columns.split(',') if i.strip()]
+    else:
+        args.drop_columns = []
     main(args)

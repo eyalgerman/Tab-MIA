@@ -145,14 +145,32 @@ def main(args):
     print(f"Starting the process on mode: {args.data}")
     use_existing_data = True if args.use_existing.lower() in ['all', 'data'] else False
     if args.data[-4:] == ".csv":
-        file_path_member, file_path_non_member, output_jsonl_path = process_csv_file.chunk_csv_to_text(args.data, output_dir=output_dir, seed=args.seed, table_encoding=args.table_encoding, use_existing_data=use_existing_data, chunk_size=args.max_table_size)
+        file_path_member, file_path_non_member, output_jsonl_path = process_csv_file.chunk_csv_to_text(
+            args.data,
+            output_dir=output_dir,
+            seed=args.seed,
+            table_encoding=args.table_encoding,
+            use_existing_data=use_existing_data,
+            chunk_size=args.max_table_size,
+            drop_columns=args.drop_columns
+        )
     elif args.data.startswith("tabMIA_"):
         # Load dataset from Hugging Face, e.g., "tabMIA_adult"
         dataset_name = args.data.split("_", 1)[1]  # safely extract after the first "_"
         encoding = args.table_encoding.replace("-", "_")
         output_jsonl_path, file_path_member = get_hf_dataset(dataset_name, encoding, output_dir + "/Datasets/")
     else:
-        file_path_member, file_path_non_member, output_jsonl_path = load_data_unique_tables(data_mode=args.data, split=args.split, output_dir=output_dir, top_k=args.top_k, seed=args.seed, use_existing_data=use_existing_data, table_encoding=args.table_encoding, max_table_size=args.max_table_size)
+        file_path_member, file_path_non_member, output_jsonl_path = load_data_unique_tables(
+            data_mode=args.data,
+            split=args.split,
+            output_dir=output_dir,
+            top_k=args.top_k,
+            seed=args.seed,
+            use_existing_data=use_existing_data,
+            table_encoding=args.table_encoding,
+            max_table_size=args.max_table_size,
+            drop_columns=args.drop_columns
+        )
     # fine-tune the model
     use_existing_model = True if args.use_existing.lower() in ['all', 'model'] else False
     new_model = None
@@ -172,23 +190,37 @@ def main(args):
     tarin_jsonl_path = output_jsonl_path
     for enc in encoders:
         try:
-            if enc == args.table_encoding:
-                output_jsonl_path = tarin_jsonl_path
-            elif args.data[-4:] == ".csv":
-                file_path_member, file_path_non_member, output_jsonl_path = process_csv_file.chunk_csv_to_text(args.data, output_dir=output_dir, seed=args.seed, table_encoding=enc, use_existing_data=True, chunk_size=args.max_table_size)
+            # if enc == args.table_encoding:
+            #     output_jsonl_path = tarin_jsonl_path
+            if args.data[-4:] == ".csv":
+                file_path_member, file_path_non_member, output_jsonl_path = process_csv_file.chunk_csv_to_text(
+                    args.data,
+                    output_dir=output_dir,
+                    seed=args.seed,
+                    table_encoding=enc,
+                    use_existing_data=True,
+                    chunk_size=args.max_table_size,
+                    drop_columns=None
+                )
             elif args.data.startswith("tabMIA_"):
                 # Load dataset from Hugging Face, e.g., "tabMIA_adult"
                 dataset_name = args.data.split("_", 1)[1]  # safely extract after the first "_"
                 encoding = enc.replace("-", "_")
                 output_jsonl_path, file_path_member = get_hf_dataset(dataset_name, encoding, output_dir + "/Datasets/")
             else:
-                file_path_member, file_path_non_member, output_jsonl_path = load_data_unique_tables(data_mode=args.data, split=args.split, output_dir=output_dir, top_k=args.top_k, seed=args.seed, use_existing_data=True, table_encoding=enc, max_table_size=args.max_table_size)
-            # Check if it has a metrics results file
-            metrics_path = None
-            if metrics_path is None and args.use_existing == 'all':
-                mia_detection.main(model_path=new_model, data_path=output_jsonl_path, output_dir=args.output_dir)
-            else:
-                print(f"Metrics file already exists: {metrics_path}")
+                file_path_member, file_path_non_member, output_jsonl_path = load_data_unique_tables(
+                    data_mode=args.data,
+                    split=args.split,
+                    output_dir=output_dir,
+                    top_k=args.top_k,
+                    seed=args.seed,
+                    use_existing_data=True,
+                    table_encoding=enc,
+                    max_table_size=args.max_table_size,
+                    drop_columns=None
+                )
+            print(f"Processing encoder: {enc}")
+            mia_detection.main(model_path=new_model, data_path=output_jsonl_path, output_dir=args.output_dir)
         except Exception as e:
             print(f"Error processing encoder {enc}: \n{e}")
             raise e
@@ -197,4 +229,8 @@ def main(args):
 if __name__ == '__main__':
     args = Options()
     args = args.parser.parse_args()
+    if args.drop_columns:
+        args.drop_columns = [int(i) for i in args.drop_columns.split(',') if i.strip()]
+    else:
+        args.drop_columns = []
     main(args)

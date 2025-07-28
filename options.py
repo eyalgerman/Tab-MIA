@@ -33,5 +33,11 @@ class Options:
         self.parser.add_argument('--num_epochs', type=int, default=1, help="the number of epochs to train the model")
         self.parser.add_argument('--table_encoding', type=str, default="line-sep", help="the table encoder to use")
         self.parser.add_argument('--max_table_size', type=int, default=-1, help="the maximum size of the table")
+        self.parser.add_argument(
+            '--drop_columns',
+            type=str,
+            default="",
+            help='comma-separated list of column indexes (0-based) to remove from tables'
+        )
 
         self.parser.add_argument('--syn_data', type=str, default="synthetic_data.csv", help="the synthetic data to use")

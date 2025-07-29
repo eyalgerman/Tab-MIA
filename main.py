@@ -183,12 +183,9 @@ def main(args):
                 output_jsonl_path, file_path_member = get_hf_dataset(dataset_name, encoding, output_dir + "/Datasets/")
             else:
                 file_path_member, file_path_non_member, output_jsonl_path = load_data_unique_tables(data_mode=args.data, split=args.split, output_dir=output_dir, top_k=args.top_k, seed=args.seed, use_existing_data=True, table_encoding=enc, max_table_size=args.max_table_size)
-            # Check if it has a metrics results file
-            metrics_path = None
-            if metrics_path is None and args.use_existing == 'all':
-                mia_detection.main(model_path=new_model, data_path=output_jsonl_path, output_dir=args.output_dir)
-            else:
-                print(f"Metrics file already exists: {metrics_path}")
+            # Run MIA detection
+            mia_detection.main(model_path=new_model, data_path=output_jsonl_path, output_dir=args.output_dir)
+
         except Exception as e:
             print(f"Error processing encoder {enc}: \n{e}")
             raise e

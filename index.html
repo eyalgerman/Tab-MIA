@@ -141,9 +141,9 @@
           <caption class="has-text-weight-semibold">Datasets in Tab‑MIA</caption>
           <thead><tr><th>Collection</th><th>Domain</th><th>Context</th><th># Records</th><th># Features</th></tr></thead>
           <tbody>
-            <tr><td>WikiTableQuestions</td><td>Wikipedia QA</td><td>Short</td><td>1 290</td><td>≥ 5</td></tr>
-            <tr><td>WikiSQL</td><td>Wikipedia SQL</td><td>Short</td><td>17 900</td><td>≥ 5</td></tr>
-            <tr><td>TabFact</td><td>Fact Verification</td><td>Short</td><td>13 100</td><td>≥ 5</td></tr>
+            <tr><td>WikiTableQuestions</td><td>Wikipedia</td><td>Short</td><td>1 290</td><td>≥ 5</td></tr>
+            <tr><td>WikiSQL</td><td>Wikipedia</td><td>Short</td><td>17 900</td><td>≥ 5</td></tr>
+            <tr><td>TabFact</td><td>Wikipedia</td><td>Short</td><td>13 100</td><td>≥ 5</td></tr>
             <tr><td>Adult (Census)</td><td>Income Prediction</td><td>Long</td><td>2 440</td><td>15</td></tr>
             <tr><td>California Housing</td><td>Housing Prices</td><td>Long</td><td>1 030</td><td>10</td></tr>
           </tbody>
@@ -153,22 +153,65 @@
   </div>
 </section>
 
-<!-- ░░░ Encoding Effect Result ░░░ -->
+
+<!-- ░░░ Encoding Effect Result (Min-K++) ░░░ -->
 <section class="section">
   <div class="container is-max-desktop">
     <div class="columns is-centered">
       <div class="column is-full-width has-text-centered">
         <h2 class="title is-3">Effect of Encoding Format</h2>
         <table class="table is-striped is-hoverable is-fullwidth">
-          <caption class="has-text-weight-semibold">AUROC of Min‑K++ 20 % MIA on the WTQ dataset (Gemma‑3 4 B). Bold = best per encoding.</caption>
-          <thead><tr><th>Encoding</th><th>AUROC</th></tr></thead>
+          <caption class="has-text-weight-semibold">AUROC scores on the WTQ dataset for Min‑K++ 20 % MIA across encoding formats and models. Bold = best per row.</caption>
+          <thead>
+            <tr>
+              <th>Encoding</th>
+              <th>Llama-3.2 3B</th>
+              <th>Mistral 7B</th>
+              <th>Gemma-3 4B</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td>Markdown</td><td><strong>85.2</strong></td></tr>
-            <tr><td>JSON</td><td>71.2</td></tr>
-            <tr><td>HTML</td><td>85.0</td></tr>
-            <tr><td>Key‑Value Pair</td><td>83.5</td></tr>
-            <tr><td>Key‑is‑Value</td><td>85.0</td></tr>
-            <tr><td>Line‑Separated</td><td>89.6</td></tr>
+            <tr><td>Markdown</td><td>85.3</td><td><strong>94.2</strong></td><td>86.7</td></tr>
+            <tr><td>JSON</td><td>79.8</td><td><strong>82.7</strong></td><td>79.2</td></tr>
+            <tr><td>HTML</td><td>79.7</td><td><strong>92.9</strong></td><td>83.3</td></tr>
+            <tr><td>Key-Value Pair</td><td>83.5</td><td><strong>94.9</strong></td><td>85.5</td></tr>
+            <tr><td>Key-is-Value</td><td>83.7</td><td><strong>89.7</strong></td><td>85.0</td></tr>
+            <tr><td>Line-Separated</td><td>89.7</td><td><strong>97.7</strong></td><td>89.6</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░░ Epoch Effect (Line-Separated, Min-K++) ░░░ -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+        <h2 class="title is-3">Effect of Fine-Tuning Epochs</h2>
+        <table class="table is-striped is-hoverable is-fullwidth">
+          <caption class="has-text-weight-semibold">AUROC vs. epochs across datasets (Line‑Separated encoding, Min‑K++ 20 % MIA). Bold = best per row.</caption>
+          <thead>
+            <tr><th>Model</th><th># Epochs</th><th>Adult</th><th>California</th><th>WTQ</th><th>WikiSQL</th><th>TabFact</th></tr>
+          </thead>
+          <tbody>
+            <!-- LLaMA-3.1 8B -->
+            <tr><td rowspan="3">LLaMA-3.1 8B</td><td>1</td><td>55.1</td><td>59.0</td><td>61.6</td><td>64.5</td><td><strong>64.9</strong></td></tr>
+            <tr><td>2</td><td>60.0</td><td>72.8</td><td><strong>80.8</strong></td><td>78.6</td><td>79.6</td></tr>
+            <tr><td>3</td><td>71.1</td><td>87.8</td><td><strong>93.6</strong></td><td>88.9</td><td>89.9</td></tr>
+            <!-- LLaMA-3.2 3B -->
+            <tr><td rowspan="3">LLaMA-3.2 3B</td><td>1</td><td>54.1</td><td>57.7</td><td>57.6</td><td><strong>61.5</strong></td><td>61.5</td></tr>
+            <tr><td>2</td><td>58.0</td><td>66.8</td><td><strong>74.8</strong></td><td>73.6</td><td>73.4</td></tr>
+            <tr><td>3</td><td>64.4</td><td>77.2</td><td><strong>89.7</strong></td><td>83.2</td><td>80.4</td></tr>
+            <!-- Mistral 7B -->
+            <tr><td rowspan="3">Mistral 7B</td><td>1</td><td>54.6</td><td>57.8</td><td><strong>69.7</strong></td><td>67.5</td><td>68.5</td></tr>
+            <tr><td>2</td><td>58.9</td><td>70.3</td><td><strong>88.4</strong></td><td>80.0</td><td>81.2</td></tr>
+            <tr><td>3</td><td>71.5</td><td>86.8</td><td><strong>97.7</strong></td><td>87.8</td><td>89.9</td></tr>
+            <!-- Gemma-3 4B -->
+            <tr><td rowspan="3">Gemma-3 4B</td><td>1</td><td>53.9</td><td>54.3</td><td>59.3</td><td>62.6</td><td><strong>63.3</strong></td></tr>
+            <tr><td>2</td><td>58.9</td><td>62.5</td><td>77.0</td><td>76.6</td><td><strong>77.9</strong></td></tr>
+            <tr><td>3</td><td>67.7</td><td>73.8</td><td><strong>89.6</strong></td><td>86.1</td><td>87.4</td></tr>
           </tbody>
         </table>
       </div>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Tab-MIA is the first benchmark that systematically evaluates membership‑inference attacks (MIAs) on large‑language‑models fine‑tuned with tabular data across six popular serialization formats.">
+  <meta name="keywords" content="Tab-MIA, benchmark, membership-inference attack, tabular data, large language models, privacy, dataset">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tab‑MIA — Benchmark for MIAs on Tabular Data in LLMs</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<!-- ░░░ Hero ░░░ -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">
+            Tab‑MIA: A Benchmark Dataset<br>
+            for Membership Inference Attacks<br>
+            on Tabular Data in LLMs
+          </h1>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><a href="https://scholar.google.com/citations?user=MB6doTkAAAAJ">Eyal German</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://scholar.google.com/citations?user=j_WBtHIAAAAJ">Sagiv Antebi</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://scholar.google.com/citations?user=_eJmvicAAAAJ">Daniel Samira</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://scholar.google.com/citations?user=k-J7GfgAAAAJ">Asaf Shabtai</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://scholar.google.com/citations?user=ruZDm9QAAAAJ">Yuval Elovici</a><sup>1</sup></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Ben‑Gurion University of the Negev</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- arXiv link -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2507.17259" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span><span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://huggingface.co/datasets/germane/Tab-MIA" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-database"></i></span><span>Dataset</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/eyalgerman/Tab-MIA" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░░ Teaser ░░░ -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <figure class="image">
+        <img src="./static/images/tab-mia_encodings.png" alt="The same table serialized into six encoding formats used in Tab‑MIA" style="max-width:100%; height:auto;">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ░░░ Abstract ░░░ -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p><strong>Tab‑MIA</strong> introduces the first dedicated benchmark for measuring how susceptible large‑language‑models (LLMs) are to <em>membership‑inference attacks</em> (MIAs) when they are trained on <em>tabular</em> data. The benchmark bundles five real‑world table collections — ranging from census records to Wikipedia QA tables — and serialises each one into six popular text‑based formats (JSON, HTML, Markdown, Key‑Value, Key‑is‑Value and Line‑Separated).</p>
+          <p>Using Tab‑MIA we evaluate three state‑of‑the‑art black‑box MIAs (LOSS, Min‑K %, Min‑K %++) against four open‑weight LLMs (LLaMA‑3 8 B, LLaMA‑3 3 B, Mistral 7 B and Gemma‑3 4 B). Even with as few as <em>three epochs</em> of fine‑tuning, attacks achieve AUROC scores above 90 % on most short‑context datasets, revealing severe privacy risks. We further show that <em>encoding choices matter:</em> flat row‑oriented serialisations (Line‑Separated, Key‑Value) amplify memorisation, whereas tag‑heavy encodings such as HTML dilute it.</p>
+          <p>Tab‑MIA is released on HuggingFace together with evaluation scripts to catalyse future research on privacy‑preserving training and defences for tabular data in LLMs.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░░ Benchmark Overview ░░░ -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Benchmark Overview</h2>
+        <div class="content has-text-justified">
+          <p>Each dataset in Tab‑MIA undergoes a <em>three‑step pipeline</em>: (i) deduplication and filtering, (ii) optional row‑chunking for long tables, and (iii) six‑fold serialization. The result is a set of JSONL files whose lines correspond to individual tables (or table chunks), making it simple to stream data during fine‑tuning.</p>
+          <p>The table below summarises the included collections.</p>
+        </div>
+        <table class="table is-striped is-hoverable is-fullwidth">
+          <caption class="has-text-weight-semibold">Datasets in Tab‑MIA</caption>
+          <thead><tr><th>Collection</th><th>Domain</th><th>Context</th><th># Records</th><th># Features</th></tr></thead>
+          <tbody>
+            <tr><td>WikiTableQuestions</td><td>Wikipedia QA</td><td>Short</td><td>1 290</td><td>≥ 5</td></tr>
+            <tr><td>WikiSQL</td><td>Wikipedia SQL</td><td>Short</td><td>17 900</td><td>≥ 5</td></tr>
+            <tr><td>TabFact</td><td>Fact Verification</td><td>Short</td><td>13 100</td><td>≥ 5</td></tr>
+            <tr><td>Adult (Census)</td><td>Income Prediction</td><td>Long</td><td>2 440</td><td>15</td></tr>
+            <tr><td>California Housing</td><td>Housing Prices</td><td>Long</td><td>1 030</td><td>10</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░░ Encoding Effect Result ░░░ -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+        <h2 class="title is-3">Effect of Encoding Format</h2>
+        <table class="table is-striped is-hoverable is-fullwidth">
+          <caption class="has-text-weight-semibold">AUROC of Min‑K++ 20 % MIA on the WTQ dataset (Gemma‑3 4 B). Bold = best per encoding.</caption>
+          <thead><tr><th>Encoding</th><th>AUROC</th></tr></thead>
+          <tbody>
+            <tr><td>Markdown</td><td><strong>85.2</strong></td></tr>
+            <tr><td>JSON</td><td>71.2</td></tr>
+            <tr><td>HTML</td><td>85.0</td></tr>
+            <tr><td>Key‑Value Pair</td><td>83.5</td></tr>
+            <tr><td>Key‑is‑Value</td><td>85.0</td></tr>
+            <tr><td>Line‑Separated</td><td>89.6</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░░ BibTeX ░░░ -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+<pre><code>@misc{german2025tabmiabenchmarkdatasetmembership,
+  title        = {Tab-MIA: A Benchmark Dataset for Membership Inference Attacks on Tabular Data in LLMs},
+  author       = {Eyal German and Sagiv Antebi and Daniel Samira and Asaf Shabtai and Yuval Elovici},
+  year         = {2025},
+  eprint       = {2507.17259},
+  archivePrefix= {arXiv},
+  primaryClass = {cs.CR},
+  url          = {https://arxiv.org/abs/2507.17259}
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution‑ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            Source code adapted from the <a href="https://github.com/nerfies/nerfies.github.io">nerfies project template</a>; please keep a link back to this page if you reuse it.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
